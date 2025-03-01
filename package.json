@@ -1,0 +1,66 @@
+{
+  "name": "@phatg/git-cors-proxy",
+  "version": "0.0.1",
+  "description": "Proxy clone and push requests for the browser (pair with isomorphic-git client)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "git-cors-proxy": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json",
+    "start": "node dist/cli/index.js start",
+    "dev": "tsx watch src/cli/index.ts start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:typecheck": "vitest run --typecheck",
+    "lint": "eslint --ext .ts src/",
+    "prepare": "npm run build",
+    "format": "prettier --write 'src/**/*.ts'",
+    "semantic-release": "semantic-release"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE.md"
+  ],
+  "keywords": [
+    "git",
+    "isomorphic-git",
+    "cors",
+    "proxy"
+  ],
+  "author": "yyyyaaa <yyyyaaa@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yyyyaaa/git-cors-proxy.git"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.2",
+    "daemonize-process": "^1.0.9",
+    "fastify": "^5.2.1",
+    "fastify-plugin": "^4.0.0",
+    "minimisted": "^2.0.0",
+    "node-fetch": "^2.6.0",
+    "tree-kill": "^1.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/node": "^22.13.5",
+    "@types/node-fetch": "^2.6.4",
+    "@vitest/coverage-v8": "^1.4.0",
+    "eslint": "^9.21.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.25.0",
+    "vitest": "^1.6.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
