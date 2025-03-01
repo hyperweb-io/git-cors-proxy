@@ -18,9 +18,12 @@ interface CliOptions {
  * @param daemon Whether to run as a daemon
  */
 async function startServer(
-  port: number = 9999,
+  port?: number,
   daemon: boolean = false
 ): Promise<void> {
+  // Use PORT environment variable for Railway compatibility
+  const serverPort = port || parseInt(process.env.PORT || "9999", 10);
+
   // Daemonize if requested
   if (daemon) {
     daemonize();
@@ -30,7 +33,7 @@ async function startServer(
   const server = createServer();
 
   try {
-    await server.listen({ port, host: "0.0.0.0" });
+    await server.listen({ port: serverPort, host: "0.0.0.0" });
 
     // Write PID file
     fs.writeFileSync(
@@ -39,7 +42,7 @@ async function startServer(
       "utf8"
     );
 
-    console.log(`CORS proxy server listening on port ${port}`);
+    console.log(`CORS proxy server listening on port ${serverPort}`);
 
     // Handle process exit
     process.on("SIGINT", async () => {

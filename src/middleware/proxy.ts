@@ -207,6 +207,11 @@ export function registerProxyMiddleware(
   // Add hooks for parsing URL and validating Git requests
   fastify.addHook("preHandler", parseUrl);
 
+  // Add health check endpoint for Railway
+  fastify.get("/health", async (_req, reply) => {
+    return reply.code(200).send({ status: "ok" });
+  });
+
   // Add route for the root path
   fastify.get("/", async (_req, reply) => {
     const html = `<!DOCTYPE html>

@@ -136,6 +136,48 @@ _Example:_
             port: proxy
 ```
 
+## Deploying to Railway
+
+This project is ready to be deployed to [Railway](https://railway.app/), a modern platform for deploying applications.
+
+### Prerequisites
+
+- A Railway account
+- Git repository with your code
+
+### Deployment Steps
+
+1. **Fork or clone this repository**
+
+2. **Connect to Railway**:
+   - Go to [Railway Dashboard](https://railway.app/)
+   - Click "New Project"
+   - Select "Deploy from GitHub repo"
+   - Connect your GitHub account if not already connected
+   - Select this repository
+
+3. **Configure Environment Variables**:
+   - In your Railway project, go to the "Variables" tab
+   - Add the following variables:
+     - `NODE_ENV`: `production`
+     - `ALLOW_ORIGIN`: `*` (or your specific allowed origins)
+     - `INSECURE_HTTP_ORIGINS`: Comma-separated list of domains to connect via HTTP instead of HTTPS (optional)
+
+4. **Deploy**:
+   - Railway will automatically deploy your application
+   - You can view the deployment logs in the "Deployments" tab
+
+5. **Custom Domain (Optional)**:
+   - In your Railway project, go to the "Settings" tab
+   - Under "Domains", add your custom domain
+   - Configure DNS records as instructed
+
+### Monitoring
+
+Railway provides built-in monitoring and logging:
+- Use the "Metrics" tab to monitor resource usage
+- Use the "Logs" tab to view application logs
+
 ## License
 
 This work is released under [The MIT License](https://opensource.org/licenses/MIT)

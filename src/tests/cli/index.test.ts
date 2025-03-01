@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from "vitest";
 import { main } from "../../cli/index";
 import fs from "fs";
-import path from "path";
 import { createServer } from "../../index";
 import kill from "tree-kill";
 import daemonize from "daemonize-process";

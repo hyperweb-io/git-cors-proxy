@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { registerProxyMiddleware } from "../../middleware/proxy";
 import { FastifyReply, FastifyRequest } from "fastify";
-import fetch from "node-fetch";
 import { RequestWithParsedUrl } from "../../utils/types";
 import { createMockFastifyInstance } from "../utils/mock-fastify";
 
@@ -50,8 +49,13 @@ describe("Proxy Middleware", () => {
     it("should register a route for the root path", () => {
       registerProxyMiddleware(mockFastify);
 
-      expect(mockFastify.get).toHaveBeenCalledTimes(1);
+      // Updated to account for both root and health check endpoints
+      expect(mockFastify.get).toHaveBeenCalledTimes(2);
       expect(mockFastify.get).toHaveBeenCalledWith("/", expect.any(Function));
+      expect(mockFastify.get).toHaveBeenCalledWith(
+        "/health",
+        expect.any(Function)
+      );
     });
 
     it("should register a catch-all route for Git requests", () => {
@@ -140,8 +144,15 @@ describe("Proxy Middleware", () => {
     it("should return HTML for the root path", async () => {
       // Get the root path handler
       registerProxyMiddleware(mockFastify);
-      const rootHandler = (mockFastify.get as ReturnType<typeof vi.fn>).mock
-        .calls[0][1];
+
+      // Find the root path handler (index 0 or 1 depending on registration order)
+      const getRootHandlerCalls = (mockFastify.get as ReturnType<typeof vi.fn>)
+        .mock.calls;
+      const rootHandlerCall = getRootHandlerCalls.find(
+        (call) => call[0] === "/"
+      );
+      expect(rootHandlerCall).toBeDefined();
+      const rootHandler = rootHandlerCall![1];
 
       // Create mock reply
       const reply = {
@@ -157,6 +168,34 @@ describe("Proxy Middleware", () => {
       expect(reply.send).toHaveBeenCalledWith(
         expect.stringContaining("<!DOCTYPE html>")
       );
+    });
+
+    it("should return status ok for the health check endpoint", async () => {
+      // Get the health check handler
+      registerProxyMiddleware(mockFastify);
+
+      // Find the health check handler
+      const getHealthHandlerCalls = (
+        mockFastify.get as ReturnType<typeof vi.fn>
+      ).mock.calls;
+      const healthHandlerCall = getHealthHandlerCalls.find(
+        (call) => call[0] === "/health"
+      );
+      expect(healthHandlerCall).toBeDefined();
+      const healthHandler = healthHandlerCall![1];
+
+      // Create mock reply with code method
+      const reply = {
+        code: vi.fn().mockReturnThis(),
+        send: vi.fn(),
+      };
+
+      // Call the health check handler
+      await healthHandler({}, reply);
+
+      // Check that status ok was returned
+      expect(reply.code).toHaveBeenCalledWith(200);
+      expect(reply.send).toHaveBeenCalledWith({ status: "ok" });
     });
   });
 
