@@ -164,13 +164,21 @@ This project is ready to be deployed to [Railway](https://railway.app/), a moder
      - `INSECURE_HTTP_ORIGINS`: Comma-separated list of domains to connect via HTTP instead of HTTPS (optional)
 
 4. **Deploy**:
-   - Railway will automatically deploy your application
+   - Railway will automatically deploy your application using the Dockerfile
    - You can view the deployment logs in the "Deployments" tab
 
 5. **Custom Domain (Optional)**:
    - In your Railway project, go to the "Settings" tab
    - Under "Domains", add your custom domain
    - Configure DNS records as instructed
+
+### Troubleshooting Deployment
+
+If you encounter build issues:
+- Check the deployment logs for specific error messages
+- Ensure the `tsconfig.json` file is properly included in your repository
+- Verify that all dependencies are correctly listed in `package.json`
+- Try redeploying after making changes
 
 ### Monitoring
 
