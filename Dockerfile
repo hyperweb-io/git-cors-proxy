@@ -2,15 +2,11 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy package files first for better caching
-COPY package*.json ./
+# Copy everything
+COPY . .
 
 # Install dependencies
 RUN npm ci
-
-# Copy source code and config files
-COPY tsconfig.json ./
-COPY src/ ./src/
 
 # Build the application
 RUN npm run build

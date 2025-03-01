@@ -16,7 +16,6 @@
     "test:coverage": "vitest run --coverage",
     "test:typecheck": "vitest run --typecheck",
     "lint": "eslint --ext .ts src/",
-    "prepare": "npm run build",
     "format": "prettier --write 'src/**/*.ts'",
     "semantic-release": "semantic-release"
   },
