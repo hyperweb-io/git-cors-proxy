@@ -33,7 +33,12 @@ async function startServer(
   const server = createServer();
 
   try {
-    await server.listen({ port: serverPort, host: "0.0.0.0" });
+    // Use "::" as host for Railway compatibility
+    // This allows the app to be available over both public and private networks
+    await server.listen({
+      port: serverPort,
+      host: process.env.NODE_ENV === "production" ? "::" : "0.0.0.0",
+    });
 
     // Write PID file
     fs.writeFileSync(

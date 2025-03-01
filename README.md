@@ -172,6 +172,26 @@ This project is ready to be deployed to [Railway](https://railway.app/), a moder
    - Under "Domains", add your custom domain
    - Configure DNS records as instructed
 
+### Railway-Specific Configuration
+
+This project includes several Railway-specific configurations:
+
+1. **Host Configuration**: 
+   - The server is configured to listen on `::` in production environments, which is required by Railway
+   - This allows the app to be available over both public and private networks
+
+2. **Port Configuration**:
+   - The application automatically uses the `PORT` environment variable provided by Railway
+   - A fallback to port 9999 is used for local development
+
+3. **Health Check Endpoint**:
+   - A `/health` endpoint is provided for Railway's health checks
+   - This ensures Railway can monitor the application's status
+
+4. **Docker Configuration**:
+   - The Dockerfile is optimized for Railway deployment
+   - It uses the `PORT` environment variable for exposing the correct port
+
 ### Troubleshooting Deployment
 
 If you encounter build issues:
@@ -179,6 +199,11 @@ If you encounter build issues:
 - Ensure the `tsconfig.json` file is properly included in your repository
 - Verify that all dependencies are correctly listed in `package.json`
 - Try redeploying after making changes
+
+If you see 502 errors:
+- Verify that the server is listening on `::` host in production
+- Check that the health check endpoint is responding correctly
+- Review the application logs for any startup errors
 
 ### Monitoring
 

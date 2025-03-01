@@ -16,7 +16,8 @@ COPY . .
 RUN npm run build
 
 # Expose the port
-EXPOSE 9999
+# Railway automatically exposes the PORT environment variable
+EXPOSE ${PORT:-9999}
 
 # Start the server
 CMD ["node", "dist/cli/index.js", "start"]
