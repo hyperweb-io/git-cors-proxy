@@ -60,6 +60,13 @@ vi.mock("daemonize-process", () => ({
 const originalExit = process.exit;
 const mockExit = vi.fn();
 
+// Store original console methods
+const originalConsole = {
+  log: console.log,
+  error: console.error,
+  warn: console.warn,
+};
+
 describe("CLI", () => {
   // Reference to the mock server for tests
   let mockServer: MockServer;
@@ -74,10 +81,19 @@ describe("CLI", () => {
 
     // Make createServer return our mock server
     (createServer as Mock).mockReturnValue(mockServer);
+
+    // Mock console methods to suppress output
+    console.log = vi.fn();
+    console.error = vi.fn();
+    console.warn = vi.fn();
   });
 
   afterEach(() => {
     process.exit = originalExit;
+    // Restore console methods
+    console.log = originalConsole.log;
+    console.error = originalConsole.error;
+    console.warn = originalConsole.warn;
   });
 
   describe("startServer", () => {

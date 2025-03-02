@@ -52,9 +52,13 @@ describe("Proxy Middleware", () => {
       // Updated to account for both root and health check endpoints
       expect(mockFastify.get).toHaveBeenCalledTimes(2);
       expect(mockFastify.get).toHaveBeenCalledWith("/", expect.any(Function));
+      // Updated to check for an object with schema and handler properties
       expect(mockFastify.get).toHaveBeenCalledWith(
         "/health",
-        expect.any(Function)
+        expect.objectContaining({
+          schema: expect.any(Object),
+          handler: expect.any(Function),
+        })
       );
     });
 
@@ -66,6 +70,7 @@ describe("Proxy Middleware", () => {
         expect.objectContaining({
           method: ["GET", "POST"],
           url: "/*",
+          schema: expect.any(Object),
         })
       );
     });
@@ -115,27 +120,28 @@ describe("Proxy Middleware", () => {
     it("should parse the URL and add it to the request object", () => {
       // Get the parseUrl function
       registerProxyMiddleware(mockFastify);
-      const parseUrl = (mockFastify.addHook as ReturnType<typeof vi.fn>).mock
+      const parseUrlFn = (mockFastify.addHook as ReturnType<typeof vi.fn>).mock
         .calls[0][1];
 
       // Create mock request and reply
-      const req: Partial<FastifyRequest> = {
-        url: "/github.com/user/repo/info/refs?service=git-upload-pack",
-      };
+      const req = {
+        url: "/github.com/isomorphic-git/cors-proxy?service=git-upload-pack",
+      } as FastifyRequest;
       const reply = {} as FastifyReply;
       const done = vi.fn();
 
       // Call the parseUrl function
-      parseUrl(req as FastifyRequest, reply, done);
+      parseUrlFn(req, reply, done);
 
-      // Check that the URL was parsed correctly
-      expect((req as RequestWithParsedUrl).parsedUrl).toBeDefined();
-      expect((req as RequestWithParsedUrl).parsedUrl?.pathname).toBe(
-        "/github.com/user/repo/info/refs"
+      // Check that the URL was parsed and added to the request object
+      const parsedReq = req as RequestWithParsedUrl;
+      expect(parsedReq.parsedUrl).toBeDefined();
+      expect(parsedReq.parsedUrl!.pathname).toBe(
+        "/github.com/isomorphic-git/cors-proxy"
       );
-      expect((req as RequestWithParsedUrl).parsedUrl?.query.service).toBe(
-        "git-upload-pack"
-      );
+      expect(parsedReq.parsedUrl!.query).toEqual({
+        service: "git-upload-pack",
+      });
       expect(done).toHaveBeenCalled();
     });
   });
@@ -182,7 +188,12 @@ describe("Proxy Middleware", () => {
         (call) => call[0] === "/health"
       );
       expect(healthHandlerCall).toBeDefined();
-      const healthHandler = healthHandlerCall![1];
+
+      // Extract the handler function from the route configuration
+      const healthConfig = healthHandlerCall![1];
+      expect(healthConfig).toBeDefined();
+      expect(healthConfig.handler).toBeDefined();
+      const healthHandler = healthConfig.handler;
 
       // Create mock reply with code method
       const reply = {
@@ -200,28 +211,24 @@ describe("Proxy Middleware", () => {
   });
 
   describe("Git content type handling", () => {
-    it("should correctly parse Git-specific content types", () => {
+    it("should handle Git-specific content types", () => {
       registerProxyMiddleware(mockFastify);
 
-      // Get the content type parser for git-upload-pack-request
+      // Get the content type parser function
       const contentTypeParserCalls = (
         mockFastify.addContentTypeParser as ReturnType<typeof vi.fn>
       ).mock.calls;
-      const parserCall = contentTypeParserCalls.find(
-        (call) => call[0] === "application/x-git-upload-pack-request"
-      );
-
-      // Ensure the parser was found
+      const parserCall = contentTypeParserCalls[0];
       expect(parserCall).toBeDefined();
-      const gitUploadPackParser = parserCall![2];
+      const parserFn = parserCall[2];
 
       // Create mock request, body, and done callback
       const req = {} as FastifyRequest;
-      const body = Buffer.from("test git data");
+      const body = Buffer.from("test");
       const done = vi.fn();
 
-      // Call the parser
-      gitUploadPackParser(req, body, done);
+      // Call the parser function
+      parserFn(req, body, done);
 
       // Check that the body was passed through unchanged
       expect(done).toHaveBeenCalledWith(null, body);

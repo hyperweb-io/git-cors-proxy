@@ -61,6 +61,28 @@ const gitContentTypes = [
   "application/x-git-receive-pack-result",
 ];
 
+// JSON Schema for health check response
+const healthCheckResponseSchema = {
+  type: "object",
+  properties: {
+    status: { type: "string" },
+  },
+  required: ["status"],
+  additionalProperties: false,
+};
+
+// JSON Schema for error responses
+const errorResponseSchema = {
+  type: "object",
+  properties: {
+    statusCode: { type: "number" },
+    error: { type: "string" },
+    message: { type: "string" },
+  },
+  required: ["statusCode", "error", "message"],
+  additionalProperties: false,
+};
+
 // Parse the URL and add it to the request object
 function parseUrl(
   req: FastifyRequest,
@@ -208,8 +230,17 @@ export function registerProxyMiddleware(
   fastify.addHook("preHandler", parseUrl);
 
   // Add health check endpoint for Railway
-  fastify.get("/health", async (_req, reply) => {
-    return reply.code(200).send({ status: "ok" });
+  fastify.get("/health", {
+    schema: {
+      response: {
+        200: healthCheckResponseSchema,
+        "4xx": errorResponseSchema,
+        "5xx": errorResponseSchema,
+      },
+    },
+    handler: async (_req, reply) => {
+      return reply.code(200).send({ status: "ok" });
+    },
   });
 
   // Add route for the root path
@@ -245,6 +276,12 @@ export function registerProxyMiddleware(
   fastify.route({
     method: ["GET", "POST"],
     url: "/*",
+    schema: {
+      response: {
+        "4xx": errorResponseSchema,
+        "5xx": errorResponseSchema,
+      },
+    },
     preHandler: [isGitRequest],
     handler: async (req, reply) => {
       return proxyRequest(req as RequestWithParsedUrl, reply, options);
