@@ -1,5 +1,5 @@
 {
-  "name": "@phatg/git-cors-proxy",
+  "name": "@hyperweb/git-cors-proxy",
   "version": "0.0.1",
   "description": "Proxy clone and push requests for the browser (pair with isomorphic-git client)",
   "main": "dist/index.js",
@@ -28,13 +28,14 @@
     "git",
     "isomorphic-git",
     "cors",
-    "proxy"
+    "proxy",
+    "hyperweb-io"
   ],
   "author": "yyyyaaa <yyyyaaa@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yyyyaaa/git-cors-proxy.git"
+    "url": "https://github.com/hyperweb-io/git-cors-proxy.git"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
